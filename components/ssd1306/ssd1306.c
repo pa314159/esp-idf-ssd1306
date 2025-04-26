@@ -101,15 +101,18 @@ void ssd1306_display_text(SSD1306_t * dev, int page, const char * text, int text
 	int _text_len = text_len;
 	if (_text_len > 16) _text_len = 16;
 
-	int seg = 0;
-	uint8_t image[8];
+	int offset = 0;
+	uint8_t image[8*text_len];
+
 	for (int i = 0; i < _text_len; i++) {
-		memcpy(image, font8x8_basic_tr[(uint8_t)text[i]], 8);
-		if (invert) ssd1306_invert(image, 8);
-		if (dev->_flip) ssd1306_flip(image, 8);
-		ssd1306_display_image(dev, page, seg, image, 8);
-		seg = seg + 8;
+		memcpy(image + offset, font8x8_basic_tr[(uint8_t)text[i]], 8);
+		offset = offset + 8;
 	}
+
+	if (invert) ssd1306_invert(image, offset);
+	if (dev->_flip) ssd1306_flip(image, offset);
+
+	ssd1306_display_image(dev, page, 0, image, offset);
 }
 
 void ssd1306_display_text_box1(SSD1306_t * dev, int page, int seg, const char * text, int box_width, int text_len, bool invert, int delay)
