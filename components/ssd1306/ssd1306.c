@@ -562,7 +562,7 @@ void _ssd1306_bitmaps(SSD1306_t * dev, int xpos, int ypos, const uint8_t * bitma
 				wk2 = ssd1306_copy_bit(wk1, srcBits, wk0, dstBits);
 				if (dev->_flip) wk2 = ssd1306_rotate_byte(wk2);
 
-				ESP_LOGD(__FUNCTION__, "index=%d offset=%d wk1=0x%x page=%d _seg=%d, wk2=%02x", index, offset, wk1, page, _seg, wk2);
+				// ESP_LOGD(__FUNCTION__, "index=%d offset=%d wk1=0x%x page=%d _seg=%d, wk2=%02x", index, offset, wk1, page, _seg, wk2);
 				if (_seg >= 128) {
 					ESP_LOGW(__FUNCTION__, "segment is out of range");
 					break;
@@ -766,7 +766,7 @@ void ssd1306_flip(uint8_t *buf, size_t blen)
 
 uint8_t ssd1306_copy_bit(uint8_t src, int srcBits, uint8_t dst, int dstBits)
 {
-	ESP_LOGD(__FUNCTION__, "src=%02x srcBits=%d dst=%02x dstBits=%d", src, srcBits, dst, dstBits);
+	// ESP_LOGD(__FUNCTION__, "src=%02x srcBits=%d dst=%02x dstBits=%d", src, srcBits, dst, dstBits);
 	uint8_t smask = 0x01 << srcBits;
 	uint8_t dmask = 0x01 << dstBits;
 	uint8_t _src = src & smask;
