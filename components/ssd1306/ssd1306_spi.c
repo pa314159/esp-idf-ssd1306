@@ -7,8 +7,11 @@
 #include "esp_log.h"
 
 #include "ssd1306.h"
+#include "dump.h"
 
 #define TAG "SSD1306"
+
+const char LOG_DOMAIN[] = TAG;
 
 #if CONFIG_SPI2_HOST
 #define HOST_ID SPI2_HOST
@@ -49,7 +52,7 @@ void spi_master_init(SSD1306_t * dev, int16_t mosi, int16_t sclk, int16_t cs, in
 		gpio_set_level( reset, 1 );
 	}
 
-	spi_bus_config_t spi_bus_config = {
+	const spi_bus_config_t spi_bus_config = {
 		.mosi_io_num = mosi,
 		.miso_io_num = -1,
 		.sclk_io_num = sclk,
@@ -58,6 +61,7 @@ void spi_master_init(SSD1306_t * dev, int16_t mosi, int16_t sclk, int16_t cs, in
 		.max_transfer_sz = 0,
 		.flags = 0
 	};
+	ssd1306_dump_data(&spi_bus_config, sizeof(spi_bus_config), "SPI bus config");
 
 	ESP_LOGI(TAG, "SPI HOST_ID=%d", HOST_ID);
 	ret = spi_bus_initialize( HOST_ID, &spi_bus_config, SPI_DMA_CH_AUTO );
@@ -70,6 +74,7 @@ void spi_master_init(SSD1306_t * dev, int16_t mosi, int16_t sclk, int16_t cs, in
 	devcfg.clock_speed_hz = clock_speed_hz;
 	devcfg.spics_io_num = cs;
 	devcfg.queue_size = 1;
+	ssd1306_dump_data(&devcfg, sizeof(devcfg), "SPI dev config");
 
 	spi_device_handle_t spi_device_handle;
 	ret = spi_bus_add_device( HOST_ID, &devcfg, &spi_device_handle);
@@ -156,6 +161,9 @@ bool spi_master_write_byte(const spi_device_handle_t SPIHandle, const uint8_t* D
 bool spi_master_write_commands(SSD1306_t * dev, const uint8_t * Commands, size_t DataLength )
 {
 	gpio_set_level( dev->_dc, SPI_COMMAND_MODE );
+
+	ssd1306_dump_data(Commands, DataLength, "SPI_COMMAND_MODE");
+
 	return spi_master_write_byte( dev->_spi_device_handle, Commands, DataLength );
 }
 
@@ -169,6 +177,9 @@ bool spi_master_write_command(SSD1306_t * dev, uint8_t Command )
 bool spi_master_write_data(SSD1306_t * dev, const uint8_t* Data, size_t DataLength )
 {
 	gpio_set_level( dev->_dc, SPI_DATA_MODE );
+
+	ssd1306_dump_data(Data, DataLength, "SPI_DATA_MODE");
+
 	return spi_master_write_byte( dev->_spi_device_handle, Data, DataLength );
 }
 
@@ -186,6 +197,7 @@ void spi_init(SSD1306_t * dev, int width, int height)
 	if (dev->_height == 32) spi_master_write_command(dev, 0x1F);
 	spi_master_write_command(dev, OLED_CMD_SET_DISPLAY_OFFSET);		// D3
 	spi_master_write_command(dev, 0x00);
+	// why ???
 	spi_master_write_command(dev, OLED_CONTROL_BYTE_DATA_STREAM);	// 40
 	if (dev->_flip) {
 		spi_master_write_command(dev, OLED_CMD_SET_SEGMENT_REMAP_0);	// A0

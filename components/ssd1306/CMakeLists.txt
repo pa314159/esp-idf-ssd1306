@@ -1,4 +1,4 @@
-set(component_srcs "ssd1306.c" "ssd1306_spi.c" "font8x8_basic.c")
+set(component_srcs "ssd1306.c" "ssd1306_spi.c" "font8x8_basic.c" "dump.c")
 
 # get IDF version for comparison
 set(idf_version "${IDF_VERSION_MAJOR}.${IDF_VERSION_MINOR}")
